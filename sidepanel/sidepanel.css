@@ -86,7 +86,7 @@ body {
 }
 
 input:checked + .slider {
-  background-color: #4CAF50;
+  background-color: #1d8121;
 }
 
 input:checked + .slider:before {
@@ -96,7 +96,7 @@ input:checked + .slider:before {
 .cross-icon {
   font-size: 1.5em;
   cursor: pointer;
-  color: red;
+  color: rgb(177, 23, 23);
   transition: color 0.2s ease;
 }
 

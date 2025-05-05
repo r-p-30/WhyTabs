@@ -9,7 +9,7 @@
     "permissions": ["scripting", "activeTab", "storage", "sidePanel", "contextMenus"],
     "host_permissions": ["http://*/*", "https://*/*"],
     "action": {
-        "default_popup": "popup/index.html"
+        "default_popup": "popup/popup.html"
     },
     "side_panel": {
         "default_path": "sidepanel/sidepanel.html"

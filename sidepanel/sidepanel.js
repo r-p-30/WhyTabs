@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderTabs() {
   chrome.storage.sync.get(["tabs"], (result) => {
     const tabs = result.tabs || [];
+    console.log(tabs)
     const list = document.getElementById('tabList');
     list.innerHTML = "";
 
@@ -36,7 +37,7 @@ function renderTabs() {
 
       const switchInput = document.createElement('input');
       switchInput.type = 'checkbox';
-      switchInput.checked = !tab.is_read;
+      switchInput.checked = tab.is_read;
       switchInput.addEventListener('change', () => toggleIsRead(tab));
 
       const switchSlider = document.createElement('span');
