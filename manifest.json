@@ -20,7 +20,7 @@
     "commands": {
       "open-sidepanel": {
         "suggested_key": {
-          "default": "Ctrl+Y"
+          "default": "Ctrl+Shift+Y"
         },
         "description": "Open the side panel"
       }

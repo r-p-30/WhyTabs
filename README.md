@@ -9,7 +9,7 @@ WhyTab is a lightweight and purposeful browser extension to help you **save tabs
   Add notes, tags, and optional reminders when saving a tab. If a tab is already saved, you can mark it as read directly from the popup.
 
 - **Side Panel for Managing Saved Tabs**  
-  Open a dedicated side panel (shortcut: `Ctrl + Y`) to view all saved tabs. Each entry displays its title, note, tags, reminder, and the date it was saved. You can open tabs, apply filters, or mark them as read/archived.
+  Open a dedicated side panel (shortcut: `Ctrl + Shift + Y`) to view all saved tabs. Each entry displays its title, note, tags, reminder, and the date it was saved. You can open tabs, apply filters, or mark them as read/archived.
 
 - **Reminders & Notifications**  
   Set reminders on tabs. At the chosen time, the browser will notify you with an option to open, mark as read, or snooze the tab for the next day.
@@ -43,5 +43,3 @@ WhyTab is a lightweight and purposeful browser extension to help you **save tabs
 - JavaScript (Manifest V3)
 - Chrome Extension APIs (Storage, Notifications, Side Panel)
 - HTML/CSS for UI
-
----
