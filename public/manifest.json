@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "WhyTabs",
+    "version": "1.0",
+    "description": "Save, Categorize and Declutter your saved tabs with reasons and reminders",
+    "icons": {
+      "32": "assets/icon-32.png"
+    },
+    "permissions": ["scripting", "activeTab", "storage", "sidePanel", "contextMenus"],
+    "host_permissions": ["http://*/*", "https://*/*"],
+    "action": {
+        "default_popup": "index.html#/popup"
+    },
+    "side_panel": {
+        "default_path": "index.html#/sidepanel"
+    },
+    "background": {
+        "service_worker": "service-worker.js"
+    },
+    "commands": {
+      "open-sidepanel": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+Y"
+        },
+        "description": "Open the side panel"
+      }
+    }
+}
