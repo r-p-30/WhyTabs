@@ -1,4 +1,5 @@
 let isSidePanelOpen = false;
+console.log('SW loaded');
 
 chrome.commands.onCommand.addListener((command) => {
     if (command === "open-sidepanel") {

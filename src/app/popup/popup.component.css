@@ -43,14 +43,33 @@ button {
 button:hover:enabled {
   background-color: #45a049;
 }
+
+:host {
+  display: block;
+  width: 300px;
+  height: 400px;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fdfdfd;
+  font-family: Arial, sans-serif;
+}
+
 .switch {
   position: relative;
   display: inline-block;
-  width: 24px;
-  height: 14px;
-  margin-right: 6px;
+  width: 34px;
+  height: 18px;
+  margin-left: 10px;
 }
 
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -59,32 +78,27 @@ button:hover:enabled {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 20px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+  transition: 0.3s;
+  border-radius: 34px;
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
+  height: 14px;
+  width: 14px;
   left: 2px;
   bottom: 2px;
   background-color: white;
-  transition: 0.4s;
+  transition: 0.3s;
+  border-radius: 50%;
 }
 
 input:checked + .slider {
-  background-color: #1d8121;
+  background-color: #4caf50;
 }
 
 input:checked + .slider:before {
-  transform: translateX(10px);
+  transform: translateX(16px);
 }
+

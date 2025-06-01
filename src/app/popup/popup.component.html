@@ -1,0 +1,23 @@
+<form [formGroup]="form" [attr.title]="isSaved ? tooltipMsg : null">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h3 style="margin: 0;">Save Current Tab</h3>
+  </div>
+  <hr />
+
+  <textarea
+    placeholder="Add notes."
+    formControlName="intent"
+    rows="3"
+  ></textarea>
+  <button
+    type="button"
+    (click)="saveTab()"
+    [disabled]="isSaved"
+  >
+    Save
+  </button>
+</form>
+
+<p style="margin-top:5px; font-size: 10px;">
+  {{ tooltipMsg }}
+</p>
