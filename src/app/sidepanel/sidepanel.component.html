@@ -1,1 +1,21 @@
-<p>sidepanel works!</p>
+<div class="panel">
+    <h2 class="panel-title"> Saved Tabs</h2>
+    <div id="tabList" class="tab-list">
+        <div *ngFor="let tab of savedTabs" class="tab-item">
+            <div *ngIf="tab.is_active">
+                <div class="tab-header">
+                    <a [href]="tab.url" target="_blank" class="tab-title">{{ tab.title }}</a>
+                    <div class="tab-actions">
+                        <label class="switch" title="Mark as read/unread">
+                            <input type="checkbox" class="read-checkbox" [checked]="tab.is_read" />
+                            <span class="slider"></span>
+                        </label>
+                        <span class="cross-icon archive-icon" title="Archive">x</span>
+                    </div>
+                </div>
+                <div class="tab-notes">{{ tab.intent }}</div>
+                <div class="tab-meta">{{ tab.savedAt | date: 'short' }}</div>
+            </div>
+        </div>
+    </div>
+</div>

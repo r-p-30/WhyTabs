@@ -1,17 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Tab } from '../model/tab.interface';
 import { CommonModule } from '@angular/common';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-popup',
-  imports: [ReactiveFormsModule, CommonModule, MatSlideToggleModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './popup.component.html',
   styleUrl: './popup.component.css',
-  standalone: true
 })
-export class PopupComponent {
+export class PopupComponent implements OnInit {
   form: FormGroup;
   isSaved = false;
   showReadSwitch = false;
