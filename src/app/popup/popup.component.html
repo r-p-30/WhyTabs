@@ -1,15 +1,49 @@
-<form [formGroup]="form" [attr.title]="isSaved ? tooltipMsg : null">
+<form [formGroup]="form">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0;">Save Current Tab</h3>
+        <h3 style="margin-bottom: 10px;">Save Current Tab</h3>
     </div>
     <hr />
 
+    <label for="notes">Notes:</label>
     <textarea placeholder="Add notes." formControlName="intent" rows="3"></textarea>
-    <button type="button" (click)="saveTab()" [disabled]="isSaved">
+    <div *ngIf="form.get('intent')?.invalid && (form.get('intent')?.touched || form.get('intent')?.dirty)" style="color: red; font-size: 12px;">
+        Notes are required.
+    </div>
+    <br>
+
+    <label for="tags">Tags:</label>
+    <div class="dropdown" id="tagDropdown">
+        <input type="text" class="dropdown-input" [value]="form.get('tags')?.value.join(', ')" readonly
+            placeholder="Select tags" (click)="toggleDropdown()" />
+        <div class="dropdown-content" [class.show]="isDropdownOpen">
+            <ng-container *ngFor="let tag of availableTags">
+                <input type="checkbox" id="{{tag}}" [value]="tag" (change)="onTagChange($event)"
+                    [checked]="form.get('tags')?.value.includes(tag)">
+                <label for="{{tag}}">{{tag}}</label>
+            </ng-container>
+        </div>
+    </div>
+
+    <h4 id="reminderLabel">Set Reminder</h4>
+    <div class="reminder-shortcuts">
+        <button type="button" (click)="setReminderShortcut('tomorrow')"
+            [class.selected]="selectedReminderShortcut === 'tomorrow'" class="shortcut-button">
+            Tomorrow
+        </button>
+        <button type="button" (click)="setReminderShortcut('nextWeek')"
+            [class.selected]="selectedReminderShortcut === 'nextWeek'" class="shortcut-button">
+            Next Week
+        </button>
+    </div>
+    <div class="reminder-calendar">
+        <input type="date" formControlName="reminderDate" />
+    </div>
+
+    <button type="button" (click)="saveTab()" [disabled]="form.invalid">
         Save
     </button>
 </form>
 
-<p style="margin-top:5px; font-size: 10px;">
+<p *ngIf="tooltipMsg != ''" style="margin-top:5px; font-size: 10px;">
     {{ tooltipMsg }}
 </p>

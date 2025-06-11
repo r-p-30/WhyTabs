@@ -3,7 +3,9 @@ export interface Tab {
   url: string;
   title: string;
   intent: string;
+  tags: string[];
   is_read: boolean;
   is_active: boolean;
   savedAt: string;
+  reminderAt: string | null
 }

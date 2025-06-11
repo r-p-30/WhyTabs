@@ -1,104 +1,187 @@
+:host {
+  opacity: 1;
+  transition: opacity 2s ease-out; 
+  display: block;
+}
+
+:host.fade-out {
+  opacity: 0;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  width: 300px;
-  padding: 10px;
-  background: #fdfdfd;
+    font-family: Arial, sans-serif;
+    width: 300px;
+    padding: 10px;
+    background: #fdfdfd;
 }
 
 h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
 }
 
-textarea{
-  width: 100%;
-  padding: 4px;
-  margin: 4px 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+hr{
+    margin: 0px 0px 10px;
+}
+
+textarea {
+    width: 100%;
+    padding: 4px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 textarea:disabled,
 button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: #ccc !important;
-  color: #666 !important;
-  border: 1px solid #aaa !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #ccc !important;
+    color: #666 !important;
+    border: 1px solid #aaa !important;
 }
 
 button {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    background-color: #322677d7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 button:hover:enabled {
-  background-color: #45a049;
+    background-color: #322677d7;
 }
 
 :host {
-  display: block;
-  width: 300px;
-  height: 400px;
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #fdfdfd;
-  font-family: Arial, sans-serif;
+    display: block;
+    width: 300px;
+    min-height: fit-content;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #fdfdfd;
+    font-family: Arial, sans-serif;
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 34px;
-  height: 18px;
-  margin-left: 10px;
+/* Tags Dropdown */
+.dropdown {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
 }
 
-/* Hide default checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.dropdown-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.3s;
-  border-radius: 34px;
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 100%;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 4px;
+    padding: 8px;
+    box-sizing: border-box;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 14px;
-  width: 14px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  transition: 0.3s;
-  border-radius: 50%;
+.dropdown-content.show {
+    display: block;
 }
 
-input:checked + .slider {
-  background-color: #4caf50;
+.dropdown-content input[type="checkbox"] {
+    display: none;
 }
 
-input:checked + .slider:before {
-  transform: translateX(16px);
+.dropdown-content input[type="checkbox"]+label {
+    display: block;
+    padding: 8px 5px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
 }
 
+.dropdown-content input[type="checkbox"]+label:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-content input[type="checkbox"]:checked+label {
+    background-color: #322677d7;
+    color: white;
+}
+
+/* Reminder Section */
+.reminder-shortcuts {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0px;
+}
+
+.reminder-calendar {
+    margin-bottom: 10px;
+}
+
+.reminder-calendar input[type="date"] {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.shortcut-button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    width: auto;
+    margin-top: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* Default hover for non-selected buttons */
+.shortcut-button:hover:not([disabled]):not(.selected) {
+    background-color: #d0d0d0;
+}
+
+.shortcut-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.shortcut-button.selected {
+    background-color: #322677d7;
+    color: white;
+}
+
+.shortcut-button.selected:hover {
+    background-color: #322677d7;
+}
+
+#reminderLabel{
+    margin: 0px;
+}
+
+#tagDropdown{
+    margin: 10px 0px;
+}

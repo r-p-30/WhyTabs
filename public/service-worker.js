@@ -1,5 +1,4 @@
 let isSidePanelOpen = false;
-console.log('SW loaded');
 
 chrome.commands.onCommand.addListener((command) => {
     if (command === "open-sidepanel") {
@@ -9,7 +8,6 @@ chrome.commands.onCommand.addListener((command) => {
         if (tab) {
           // Open the side panel in the current window and tab
           chrome.sidePanel.open({ windowId: tab.windowId, tabId: tab.id }, () => {
-            // Callback function to handle success or error after opening the side panel
             console.log("Side panel opened successfully");
           });
         } else {
