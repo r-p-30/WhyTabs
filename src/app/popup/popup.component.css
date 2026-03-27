@@ -9,16 +9,17 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    width: 300px;
-    padding: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 350px;
+    padding: 15px;
     background: #fdfdfd;
+    font-size: 14px;
 }
 
 h3 {
     margin-top: 0;
-    margin-bottom: 0;
-    font-size: 15px;
+    margin-bottom: 10px;
+    font-size: 18px;
 }
 
 hr{
@@ -60,15 +61,159 @@ button:hover:enabled {
 
 :host {
     display: block;
-    width: 300px;
+    width: 350px;
     min-height: fit-content;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
     background-color: #fdfdfd;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
 }
 
-/* Tags Dropdown */
+/* Tags Pill Display */
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tag-pill {
+    background-color: #322677d7;
+    color: white;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.remove-tag {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.remove-tag:hover {
+    color: #ff4d4d;
+}
+
+.field-label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* Tags Dropdown Enhancements */
+.dropdown-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    border-radius: 4px;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5f9;
+    color: #322677;
+}
+
+/* Actions Row & Toggle Switch */
+.actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.save-btn {
+    flex: 1;
+    margin-top: 0;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.header-row h3 {
+    margin: 0;
+}
+
+.read-toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+
+.toggle-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-weight: 600;
+}
+
+.header-toggle {
+    flex-direction: row;
+    gap: 8px;
+}
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .2s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .2s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #10b981;
+}
+
+input:checked + .slider:before {
+    transform: translateX(12px);
+}
+
+/* Restored Dropdown & Reminder Styles */
 .dropdown {
     position: relative;
     width: 100%;
@@ -77,58 +222,39 @@ button:hover:enabled {
 
 .dropdown-input {
     width: 100%;
-    padding: 5px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: white;
-    cursor: pointer;
+    cursor: text;
     box-sizing: border-box;
+    font-size: 13px;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: white;
     min-width: 100%;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
     border-radius: 4px;
-    padding: 8px;
+    padding: 4px;
     box-sizing: border-box;
     max-height: 150px;
     overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    margin-top: 2px;
 }
 
 .dropdown-content.show {
     display: block;
 }
 
-.dropdown-content input[type="checkbox"] {
-    display: none;
-}
-
-.dropdown-content input[type="checkbox"]+label {
-    display: block;
-    padding: 8px 5px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #333;
-}
-
-.dropdown-content input[type="checkbox"]+label:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown-content input[type="checkbox"]:checked+label {
-    background-color: #322677d7;
-    color: white;
-}
-
-/* Reminder Section */
 .reminder-shortcuts {
     display: flex;
-    gap: 10px;
-    margin: 10px 0px;
+    gap: 8px;
+    margin: 8px 0;
 }
 
 .reminder-calendar {
@@ -137,51 +263,46 @@ button:hover:enabled {
 
 .reminder-calendar input[type="date"] {
     width: 100%;
-    padding: 5px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 13px;
     box-sizing: border-box;
 }
 
 .shortcut-button {
-    background-color: #e0e0e0;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 15px;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     white-space: nowrap;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     width: auto;
     margin-top: 0;
-    flex-grow: 1;
+    flex: 1;
     text-align: center;
+    color: #475569;
 }
 
-/* Default hover for non-selected buttons */
 .shortcut-button:hover:not([disabled]):not(.selected) {
-    background-color: #d0d0d0;
-}
-
-.shortcut-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
 }
 
 .shortcut-button.selected {
     background-color: #322677d7;
     color: white;
+    border-color: #322677d7;
 }
 
-.shortcut-button.selected:hover {
-    background-color: #322677d7;
+#reminderLabel {
+    margin: 15px 0 5px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-#reminderLabel{
-    margin: 0px;
-}
-
-#tagDropdown{
-    margin: 10px 0px;
+#tagDropdown {
+    margin: 5px 0 15px;
 }

@@ -6,4 +6,6 @@ export interface SavedTab {
   savedAt: string | number;
   is_read: boolean;
   is_active: boolean;
+  tags?: string[];
+  reminderAt?: string | null;
 }

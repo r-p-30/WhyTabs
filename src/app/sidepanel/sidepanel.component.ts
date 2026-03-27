@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { SavedTab } from '../model/savedTab.interface';
 import { CommonModule } from '@angular/common';
 
@@ -9,46 +9,115 @@ import { CommonModule } from '@angular/common';
   styleUrl: './sidepanel.component.css',
 })
 export class SidepanelComponent implements OnInit {
+  allSavedTabs: SavedTab[] = [];
   savedTabs: SavedTab[] = [];
-  constructor(readonly renderer: Renderer2, readonly elRef: ElementRef, readonly ngZone: NgZone) {}
+  availableTags: string[] = [];
+  selectedFilterTags: string[] = [];
+  filterReadStatus: 'all' | 'read' | 'unread' = 'all';
+  sidePanelSearchText: string = '';
+  isFiltersCollapsed = true;
+
+  constructor(readonly ngZone: NgZone) { }
+
+
 
   ngOnInit() {
     console.log("init")
     this.renderTabs();
+
+    // Notify background that sidepanel is open
+    chrome.runtime.connect({ name: 'sidepanel' });
+
+    // Listen for storage changes to refresh tabs automatically
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'sync' && (changes['tabs'])) {
+        this.ngZone.run(() => {
+          this.renderTabs();
+        });
+      }
+    });
   }
 
   renderTabs() {
     chrome.storage.sync.get(['tabs'], (result: { tabs?: any[] }) => {
-      // Run this code inside Angular's zone to trigger change detection
       this.ngZone.run(() => {
-        this.savedTabs = (result['tabs'] ?? [])
-          .slice()
-          .reverse()
-          .filter((t) => t.is_active);
-        console.log("saved tabs", this.savedTabs);
-        // Timeout to ensure Angular renders DOM before we attach events
-        setTimeout(() => this.attachDOMListeners(), 0);
+        const tabs = (result['tabs'] ?? [])
+          .filter((t: any) => t.is_active);
+
+        // Custom Sort: Unread first, then by date (newest first)
+        this.allSavedTabs = tabs.sort((a, b) => {
+          if (a.is_read !== b.is_read) return a.is_read ? 1 : -1;
+          const dateA = new Date(a.savedAt).getTime();
+          const dateB = new Date(b.savedAt).getTime();
+          return dateB - dateA;
+        });
+
+        this.updateAvailableTags();
+        this.applyFilters();
       });
     });
   }
 
-  attachDOMListeners() {
-    const native = this.elRef.nativeElement;
 
-    const checkboxes = native.querySelectorAll('.read-checkbox');
-    const crossIcons = native.querySelectorAll('.archive-icon');
 
-    checkboxes.forEach((checkbox: HTMLInputElement, index: number) => {
-      this.renderer.listen(checkbox, 'change', () => {
-        this.toggleIsRead(this.savedTabs[index]);
-      });
+  updateAvailableTags() {
+    const tags = new Set<string>();
+    this.allSavedTabs.forEach(tab => {
+      if (tab.tags) tab.tags.forEach(tag => tags.add(tag));
     });
+    this.availableTags = Array.from(tags).sort();
+  }
 
-    crossIcons.forEach((icon: HTMLElement, index: number) => {
-      this.renderer.listen(icon, 'click', () => {
-        this.deactivateTab(this.savedTabs[index]);
-      });
+  applyFilters() {
+    this.savedTabs = this.allSavedTabs.filter(tab => {
+      // Status filter
+      if (this.filterReadStatus === 'read' && !tab.is_read) return false;
+      if (this.filterReadStatus === 'unread' && tab.is_read) return false;
+
+      // Tags filter
+      if (this.selectedFilterTags.length > 0) {
+        const hasTag = tab.tags?.some(tag => this.selectedFilterTags.includes(tag));
+        if (!hasTag) return false;
+      }
+
+      // Search filter
+      if (this.sidePanelSearchText) {
+        const search = this.sidePanelSearchText.toLowerCase();
+        return tab.title.toLowerCase().includes(search) || (tab.intent && tab.intent.toLowerCase().includes(search));
+      }
+
+      return true;
     });
+  }
+
+  toggleFilterTag(tag: string) {
+    if (this.selectedFilterTags.includes(tag)) {
+      this.selectedFilterTags = this.selectedFilterTags.filter(t => t !== tag);
+    } else {
+      this.selectedFilterTags.push(tag);
+    }
+    this.applyFilters();
+  }
+
+  setStatusFilter(status: 'all' | 'read' | 'unread') {
+    this.filterReadStatus = status;
+    this.applyFilters();
+  }
+
+  onSearchChange(event: any) {
+    this.sidePanelSearchText = event.target.value;
+    this.applyFilters();
+  }
+
+  toggleFilters() {
+    this.isFiltersCollapsed = !this.isFiltersCollapsed;
+  }
+
+  clearFilters() {
+    this.sidePanelSearchText = '';
+    this.filterReadStatus = 'all';
+    this.selectedFilterTags = [];
+    this.applyFilters();
   }
 
   toggleIsRead(tab: any) {
@@ -75,4 +144,46 @@ export class SidepanelComponent implements OnInit {
       }
     });
   }
+
+  exportData() {
+    chrome.storage.sync.get(['tabs'], (result) => {
+      const data = JSON.stringify(result['tabs'] || [], null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `whytabs_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  importData(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const tabs = JSON.parse(e.target.result);
+        if (Array.isArray(tabs)) {
+          chrome.storage.sync.set({ tabs }, () => {
+            this.ngZone.run(() => {
+              this.renderTabs();
+              alert('Data imported successfully!');
+            });
+          });
+        }
+      } catch (err) {
+        alert('Invalid backup file.');
+      }
+    };
+    reader.readAsText(file);
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
+  }
+
+
+
+
 }

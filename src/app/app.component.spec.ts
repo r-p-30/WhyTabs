@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'why-tabs-angular' title`, () => {
+  it(`should have the 'why-tabs' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('why-tabs-angular');
+    expect(app.title).toEqual('why-tabs');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, why-tabs-angular');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, why-tabs');
   });
 });

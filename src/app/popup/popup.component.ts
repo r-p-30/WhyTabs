@@ -15,16 +15,22 @@ export class PopupComponent implements OnInit {
   showReadSwitch = false;
   tooltipMsg = '';
   availableTags: string[] = ['Work', 'Personal', 'Research', 'Reading', 'Learning', 'Important', 'Later'];
+  filteredTags: string[] = [];
   isDropdownOpen = false;
   selectedReminderShortcut: 'tomorrow' | 'nextWeek' | null = null;
   isFadingOut: boolean = false;
+  tagSearchText: string = '';
 
   constructor(private fb: FormBuilder, private el: ElementRef) {
+
+
     this.form = this.fb.group({
       intent: ['', Validators.required],
       tags: [[]],
       reminderDate: [''],
+      is_read: [false]
     });
+    this.filteredTags = [...this.availableTags];
   }
 
   ngOnInit(): void {
@@ -55,9 +61,13 @@ export class PopupComponent implements OnInit {
     });
   }
 
+
+
   @HostListener('document:click', ['$event'])
+
   clickout(event: Event) {
-    if (!this.el.nativeElement.querySelector('.dropdown').contains(event.target)) {
+    const dropdown = this.el.nativeElement.querySelector('.dropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
       this.isDropdownOpen = false;
     }
   }
@@ -66,15 +76,28 @@ export class PopupComponent implements OnInit {
     const tab = await this.queryActiveTab();
     const result = await this.storageGet(['tabs']);
     const tabs = result.tabs ?? [];
-    const matchedTab = tabs.find((t: Tab) => t.url === tab.url && t.is_active);
+    const matchedTab = tabs.find((t: any) => t.url === tab.url && t.is_active);
+
 
     if (matchedTab) {
-      this.showReadSwitch = !matchedTab.is_read;
-      this.form.patchValue({
-        intent: matchedTab.intent ?? '',
-        tags: matchedTab.tags ?? [],
-        reminderDate: matchedTab.reminderAt ? new Date(matchedTab.reminderAt).toISOString().split('T')[0] : ''
+      this.showReadSwitch = true;
+        let reminderDateStr = '';
+        if (matchedTab.reminderAt) {
+          const dateObj = new Date(matchedTab.reminderAt);
+          const d = dateObj.getDate().toString().padStart(2, '0');
+          const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+          const y = dateObj.getFullYear();
+          reminderDateStr = `${d}/${m}/${y}`;
+        }
+
+        this.form.patchValue({
+          intent: matchedTab.intent ?? '',
+          tags: matchedTab.tags ?? [],
+          reminderDate: reminderDateStr,
+        is_read: matchedTab.is_read ?? false
       });
+
+
 
       if (matchedTab.reminderAt) {
         const reminderDate = new Date(matchedTab.reminderAt);
@@ -87,7 +110,6 @@ export class PopupComponent implements OnInit {
         const nextWeek = new Date(today);
         nextWeek.setDate(today.getDate() + 7);
 
-        // Check if reminder is exactly tomorrow or next week at 11 AM
         if (reminderDate.toDateString() === tomorrow.toDateString() && reminderDate.getHours() === 11) {
           this.selectedReminderShortcut = 'tomorrow';
         } else if (reminderDate.toDateString() === nextWeek.toDateString() && reminderDate.getHours() === 11) {
@@ -106,18 +128,37 @@ export class PopupComponent implements OnInit {
     }
   }
 
-  toggleDropdown(): void {
-    this.isDropdownOpen = !this.isDropdownOpen;
+  toggleDropdown(open?: boolean): void {
+    this.isDropdownOpen = open !== undefined ? open : !this.isDropdownOpen;
   }
 
-  onTagChange(event: any): void {
-    const selectedTags = this.form.get('tags')?.value as string[];
-    const tag = event.target.value;
+  onTagSearch(event: any): void {
+    this.tagSearchText = event.target.value;
+    this.filteredTags = this.availableTags.filter(tag => 
+      tag.toLowerCase().includes(this.tagSearchText.toLowerCase())
+    );
+    this.isDropdownOpen = true;
+  }
 
-    if (event.target.checked) {
+  addTag(tag: string): void {
+    const selectedTags = this.form.get('tags')?.value as string[];
+    if (!selectedTags.includes(tag)) {
       this.form.get('tags')?.setValue([...selectedTags, tag]);
-    } else {
-      this.form.get('tags')?.setValue(selectedTags.filter(t => t !== tag));
+    }
+    this.tagSearchText = '';
+    this.filteredTags = [...this.availableTags];
+    this.isDropdownOpen = false;
+  }
+
+  removeTag(tag: string): void {
+    const selectedTags = this.form.get('tags')?.value as string[];
+    this.form.get('tags')?.setValue(selectedTags.filter(t => t !== tag));
+  }
+
+  handleTagInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && this.tagSearchText.trim()) {
+      event.preventDefault();
+      this.addTag(this.tagSearchText.trim());
     }
   }
 
@@ -127,12 +168,18 @@ export class PopupComponent implements OnInit {
     const result = await this.storageGet(['tabs']);
     const tabs = result.tabs ?? [];
 
+
     let reminderAt: string | null = null;
     if (reminderDate) {
+      if (reminderDate.includes('/')) {
+        const [d, m, y] = reminderDate.split('/');
+        reminderAt = `${y}-${m}-${d}T11:00:00`;
+      } else {
         reminderAt = `${reminderDate}T11:00:00`;
+      }
     }
-    
-    const existingTabIndex = tabs.findIndex((t: Tab) => t.url === tab.url && t.is_active);
+
+    const existingTabIndex = tabs.findIndex((t: any) => t.url === tab.url && t.is_active);
     if (existingTabIndex !== -1) {
       tabs[existingTabIndex] = {
         ...tabs[existingTabIndex],
@@ -146,7 +193,7 @@ export class PopupComponent implements OnInit {
         reminderAt
       };
       this.tooltipMsg = 'Tab updated successfully!';
-    }else{
+    } else {
       tabs.push({
         id: `${tab.id}_${Date.now()}`,
         url: tab.url,
@@ -162,9 +209,11 @@ export class PopupComponent implements OnInit {
     }
 
     await this.storageSet({ tabs });
+
     this.showReadSwitch = true;
     this.startFadeOut();
   }
+
 
   setReminderShortcut(type: 'tomorrow' | 'nextWeek'): void {
     const today = new Date();
@@ -180,7 +229,7 @@ export class PopupComponent implements OnInit {
     const year = reminder.getFullYear();
     const month = (reminder.getMonth() + 1).toString().padStart(2, '0');
     const day = reminder.getDate().toString().padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+    const formattedDate = `${day}/${month}/${year}`;
 
     this.form.patchValue({
       reminderDate: formattedDate
@@ -193,19 +242,23 @@ export class PopupComponent implements OnInit {
     const tab = await this.queryActiveTab();
     const result = await this.storageGet(['tabs']);
     const tabs = result.tabs ?? [];
-    const matchedTab = tabs.find((t: Tab) => t.url === tab.url && t.is_active);
+    const matchedTab = tabs.find((t: any) => t.url === tab.url && t.is_active);
+
 
     if (!matchedTab) return;
 
     matchedTab.is_read = !matchedTab.is_read;
-    const index = tabs.findIndex((t: Tab) => t.id === matchedTab.id);
+    const index = tabs.findIndex((t: any) => t.id === matchedTab.id);
     if (index !== -1) tabs[index] = matchedTab;
 
     await this.storageSet({ tabs });
 
-    this.showReadSwitch = false;
+
+    this.form.patchValue({ is_read: matchedTab.is_read });
     this.tooltipMsg = matchedTab.is_read ? 'Marked as read!' : 'Marked as unread!';
   }
+
+
 
   private startFadeOut(): void {
     this.isFadingOut = true;

@@ -1,21 +1,137 @@
 <div class="panel">
-    <h2 class="panel-title"> Saved Tabs</h2>
-    <div id="tabList" class="tab-list">
-        <div *ngFor="let tab of savedTabs" class="tab-item">
-            <div *ngIf="tab.is_active">
-                <div class="tab-header">
-                    <a [href]="tab.url" target="_blank" class="tab-title">{{ tab.title }}</a>
-                    <div class="tab-actions">
-                        <label class="switch" title="Mark as read/unread">
-                            <input type="checkbox" class="read-checkbox" [checked]="tab.is_read" />
-                            <span class="slider"></span>
-                        </label>
-                        <span class="cross-icon archive-icon" title="Archive">x</span>
-                    </div>
-                </div>
-                <div class="tab-notes">{{ tab.intent }}</div>
-                <div class="tab-meta">{{ tab.savedAt | date: 'short' }}</div>
+    <div class="panel-header">
+        <h2 class="panel-title">Your Saved Tabs</h2>
+        <div class="header-actions">
+            <button class="icon-btn filter-toggle" (click)="toggleFilters()" [class.active]="!isFiltersCollapsed"
+                title="Filters">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="icon">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
+            <span class="tab-count">{{ savedTabs.length }} / {{ allSavedTabs.length }}</span>
+        </div>
+    </div>
+
+    <!-- Collapsible Filter Section -->
+    <div class="filters-section" [class.collapsed]="isFiltersCollapsed">
+        <div class="search-filter-row">
+            <div class="search-filter">
+                <input type="text" placeholder="Search saved tabs..." [value]="sidePanelSearchText"
+                    (input)="onSearchChange($event)" class="search-input">
             </div>
+            <button class="icon-btn clear-all-btn" (click)="clearFilters()" title="Clear all filters"
+                *ngIf="sidePanelSearchText || filterReadStatus !== 'all' || selectedFilterTags.length > 0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="icon">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+            </button>
+
+        </div>
+
+
+        <div class="filter-group">
+            <span class="filter-label">Status</span>
+            <div class="filter-options">
+                <button (click)="setStatusFilter('all')" [class.active]="filterReadStatus === 'all'">All</button>
+                <button (click)="setStatusFilter('read')" [class.active]="filterReadStatus === 'read'">Read</button>
+                <button (click)="setStatusFilter('unread')"
+                    [class.active]="filterReadStatus === 'unread'">Unread</button>
+            </div>
+        </div>
+
+        <div class="filter-group" *ngIf="availableTags.length > 0">
+            <span class="filter-label">Tags</span>
+            <div class="tags-filter">
+                <span *ngFor="let tag of availableTags" class="tag-option"
+                    [class.active]="selectedFilterTags.includes(tag)" (click)="toggleFilterTag(tag)">
+                    {{ tag }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabList" class="tab-list">
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="savedTabs.length === 0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="empty-icon">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <p>No tabs match your filters.</p>
+            <button class="clear-filters-btn" (click)="clearFilters()">Clear All Filters</button>
+
+        </div>
+
+        <div *ngFor="let tab of savedTabs" class="tab-item" [class.is-read]="tab.is_read">
+
+            <div class="tab-header">
+                <a [href]="tab.url" target="_blank" class="tab-title" [title]="tab.title">{{ tab.title }}</a>
+
+                <div class="tab-actions">
+                    <label class="switch" title="Mark as read/unread">
+                        <input type="checkbox" class="read-checkbox" [checked]="tab.is_read"
+                            (change)="toggleIsRead(tab)" />
+                        <span class="slider"></span>
+                    </label>
+                    <button class="icon-btn archive-btn archive-icon" title="Archive" (click)="deactivateTab(tab)">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <p class="tab-intent" *ngIf="tab.intent">{{ tab.intent }}</p>
+
+            <div class="tab-tags" *ngIf="tab.tags && tab.tags.length > 0">
+                <span *ngFor="let tag of tab.tags" class="tag">{{ tag }}</span>
+            </div>
+
+            <div class="tab-footer">
+                <div class="tab-meta">
+                    <span class="reminder" *ngIf="tab.reminderAt" title="Reminder set">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="mini-icon">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        {{ tab.reminderAt | date: 'MMM d, h:mm a' }}
+                    </span>
+                    <span class="time" title="Saved at">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="mini-icon">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {{ tab.savedAt | date: 'MMM d, h:mm a' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="panel-footer data-actions">
+        <span class="filter-label">Data Management</span>
+        <div class="data-buttons">
+            <button class="data-btn export-btn" (click)="exportData()" title="Backup your data to a JSON file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Backup
+            </button>
+            <button class="data-btn import-btn" (click)="importFileInput.click()" title="Restore data from a JSON backup">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Restore
+            </button>
+            <input type="file" #importFileInput style="display: none" (change)="importData($event)" accept=".json">
         </div>
     </div>
 </div>

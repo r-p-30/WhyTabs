@@ -6,7 +6,7 @@
     "icons": {
       "32": "assets/icon-32.png"
     },
-    "permissions": ["scripting", "activeTab", "storage", "sidePanel", "contextMenus"],
+    "permissions": ["scripting", "activeTab", "storage", "sidePanel", "contextMenus", "notifications", "alarms"],
     "host_permissions": ["http://*/*", "https://*/*"],
     "action": {
         "default_popup": "index.html#/popup"
@@ -18,6 +18,12 @@
         "service_worker": "service-worker.js"
     },
     "commands": {
+      "open-popup": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+L"
+        },
+        "description": "Open the popup"
+      },
       "open-sidepanel": {
         "suggested_key": {
           "default": "Ctrl+Shift+Y"

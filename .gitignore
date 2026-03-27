@@ -24,6 +24,14 @@ yarn-error.log
 .vscode/*
 .history/*
 
+# Chrome Extension
+*.crx
+*.zip
+
+# Environments
+.env
+.env.*
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
