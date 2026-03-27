@@ -1,0 +1,75 @@
+<form [formGroup]="form">
+    <div class="header-row">
+        <h3>Save Current Tab</h3>
+        <div class="read-toggle-container header-toggle" *ngIf="showReadSwitch">
+            <span class="toggle-label">{{form.get('is_read')?.value ? 'Read' : 'Unread'}}</span>
+            <label class="switch" title="Mark as read/unread">
+                <input type="checkbox" [checked]="form.get('is_read')?.value" (change)="markAsRead()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+
+
+    <hr />
+
+    <label for="notes">Notes:</label>
+    <textarea placeholder="Add notes." formControlName="intent" rows="3"></textarea>
+    <div *ngIf="form.get('intent')?.invalid && (form.get('intent')?.touched || form.get('intent')?.dirty)"
+        style="color: red; font-size: 12px;">
+        Notes are required.
+    </div>
+    <br>
+
+    <div class="field-label">Tags:</div>
+    <div class="selected-tags" *ngIf="form.get('tags')?.value?.length > 0">
+        <span *ngFor="let tag of form.get('tags')?.value" class="tag-pill">
+            {{ tag }}
+            <span class="remove-tag" (click)="removeTag(tag)">&times;</span>
+        </span>
+    </div>
+
+    <div class="dropdown" id="tagDropdown">
+        <input type="text" class="dropdown-input" [value]="tagSearchText" (input)="onTagSearch($event)"
+            (keydown)="handleTagInputKeydown($event)" (focus)="toggleDropdown(true)"
+            placeholder="Type to search or add tags..." />
+        <div class="dropdown-content" [class.show]="isDropdownOpen && (filteredTags.length > 0 || tagSearchText)">
+            <div *ngFor="let tag of filteredTags" class="dropdown-item" (click)="addTag(tag)">
+                {{ tag }}
+            </div>
+            <div *ngIf="filteredTags.length === 0 && tagSearchText" class="dropdown-item"
+                (click)="addTag(tagSearchText)">
+                Add "{{ tagSearchText }}"
+            </div>
+        </div>
+    </div>
+
+    <h4 id="reminderLabel">Set Reminder</h4>
+    <div class="reminder-shortcuts">
+        <button type="button" (click)="setReminderShortcut('tomorrow')"
+            [class.selected]="selectedReminderShortcut === 'tomorrow'" class="shortcut-button">
+            Tomorrow
+        </button>
+        <button type="button" (click)="setReminderShortcut('nextWeek')"
+            [class.selected]="selectedReminderShortcut === 'nextWeek'" class="shortcut-button">
+            Next Week
+        </button>
+    </div>
+    <div class="reminder-calendar">
+        <input type="text" formControlName="reminderDate" placeholder="DD/MM/YYYY" />
+    </div>
+
+    <div class="actions-row">
+        <button type="button" class="save-btn" (click)="saveTab()" [disabled]="form.invalid">
+            Save Tab
+        </button>
+
+
+    </div>
+
+</form>
+
+<p *ngIf="tooltipMsg != ''" style="margin-top:5px; font-size: 10px;">
+    {{ tooltipMsg }}
+</p>
